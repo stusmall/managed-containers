@@ -1,0 +1,28 @@
+{
+  "name": "managed-containers",
+  "version": "0.1.0",
+  "main": "index.js",
+  "scripts": {
+    "run": "npm run build && web-ext run --devtools -i src test coverage *.nix *.json \"*.js\" \"dist/*.map\" -i !manifest.json",
+    "build": "webpack --mode=production",
+    "pack": "npm run build && web-ext build -i src test coverage *.nix *.json \"*.js\" \"dist/*.map\" -i !manifest.json",
+    "lint": "npx eslint && npm run lint-web-ex",
+    "lint-web-ex": "web-ext lint -i src test coverage *.nix *.json \"*.js\" \"dist/*.map\" -i !manifest.json"
+  },
+  "author": "Stuart Small",
+  "license": "MPL-2.0",
+  "description": "",
+  "devDependencies": {
+    "@eslint/js": "^9.12.0",
+    "@types/eslint__js": "^8.42.3",
+    "@types/firefox-webext-browser": "^120.0.4",
+    "@types/react": "^18.3.11",
+    "eslint": "^9.12.0",
+    "prettier": "3.3.3",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.8.1",
+    "webpack": "^5.95.0",
+    "webpack-cli": "^5.1.4"
+  }
+}
