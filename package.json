@@ -6,6 +6,7 @@
     "run": "npm run build && web-ext run --devtools -i src test coverage *.nix *.json \"*.js\" \"dist/*.map\" -i !manifest.json",
     "build": "webpack --mode=production",
     "pack": "npm run build && web-ext build -i src test coverage *.nix *.json \"*.js\" \"dist/*.map\" -i !manifest.json",
+    "format": "npx prettier . --write",
     "lint": "npx eslint && npm run lint-web-ex",
     "lint-web-ex": "web-ext lint -i src test coverage *.nix *.json \"*.js\" \"dist/*.map\" -i !manifest.json"
   },
