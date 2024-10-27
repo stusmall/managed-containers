@@ -8,22 +8,30 @@
     "pack": "npm run build && web-ext build -i src test coverage *.nix *.json \"*.js\" \"dist/*.map\" -i !manifest.json",
     "format": "npx prettier . --write",
     "lint": "npx eslint && npm run lint-web-ex",
-    "lint-web-ex": "web-ext lint -i src test coverage *.nix *.json \"*.js\" \"dist/*.map\" -i !manifest.json"
+    "lint-web-ex": "web-ext lint -i src test coverage *.nix *.json \"*.js\" \"dist/*.map\" -i !manifest.json",
+    "test": "jest"
   },
   "author": "Stuart Small",
   "license": "MPL-2.0",
   "description": "",
   "devDependencies": {
     "@eslint/js": "^9.12.0",
+    "@jest/globals": "^29.7.0",
     "@types/eslint__js": "^8.42.3",
     "@types/firefox-webext-browser": "^120.0.4",
+    "@types/jest": "^29.5.13",
     "@types/react": "^18.3.11",
     "eslint": "^9.12.0",
+    "jest": "^29.7.0",
     "prettier": "3.3.3",
+    "ts-jest": "^29.2.5",
     "ts-loader": "^9.5.1",
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.8.1",
     "webpack": "^5.95.0",
     "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
   }
 }
