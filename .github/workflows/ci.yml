@@ -1,0 +1,45 @@
+name: Build and test
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    name: Lint and test
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Install Nix
+        uses: nixbuild/nix-quick-install-action@60e9c39264d4714139af3cdf15f691b19eec3530 # v28
+      - name: Setup Cache of Nix Store
+        uses: nix-community/cache-nix-action@433f47d6a0f1384702e87434ee600c0269c1526f # v5.20
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix') }}
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        shell: bash
+        run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+      - name: Setup cache
+        uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4.0.0
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Build nix environment
+        run: nix-build
+      - name: Install npm dependencies
+        run: nix-shell --command 'npm install'
+      - name: Format
+        run: nix-shell --command 'npx prettier --check .'
+      - name: Build
+        run: nix-shell --command 'npm run build'
+      - name: Lint
+        run: nix-shell --command 'npm run lint'
+      - name: Test
+        run: nix-shell --command 'npm run test'
