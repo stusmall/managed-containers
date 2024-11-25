@@ -5,11 +5,19 @@
   "incognito": "not_allowed",
   "permissions": [
     "<all_urls>",
+    "cookies",
     "contextualIdentities",
+    "storage",
+    "tabs",
     "webRequest",
     "webRequestBlocking"
   ],
   "background": {
     "scripts": ["dist/background.js"]
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "managed-containers@stuartsmall.com"
+    }
   }
 }

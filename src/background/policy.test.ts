@@ -20,26 +20,26 @@ test("To fail to parse an unknown color", () => {
   const json = {
     containers: [
       {
-        name: "soemthing",
+        name: "something",
         icon: "fruit",
         color: "madeup",
         sites: ["stuartsmall.com"],
       },
     ],
   };
-  expect(() => Policy.parse(json)).not.toBeNull();
+  expect(() => Policy.parse(json)).toThrow(ZodError);
 });
 
 test("To parse a real looking config", () => {
   const json = {
     containers: [
       {
-        name: "soemthing",
+        name: "something",
         icon: "fruit",
-        color: "purplse",
+        color: "purple",
         sites: ["stuartsmall.com"],
       },
     ],
   };
-  expect(() => Policy.parse(json)).toThrow(ZodError);
+  expect(Policy.parse(json)).toBeDefined();
 });
