@@ -1,6 +1,7 @@
 import { containerDefinitionToContextualIdentity, Policy } from "./policy";
 import { buildContainerDifference } from "./containers";
 import { ContainerRouter } from "./containerRouter";
+import ContextualIdentity = browser.contextualIdentities.ContextualIdentity;
 
 // Once we get a policy, lets attempt to parse it.  If it parses correctly update the containerRouter
 function parseAndApplyPolicy(router: ContainerRouter, blob: unknown) {
@@ -41,6 +42,29 @@ function parseAndApplyPolicy(router: ContainerRouter, blob: unknown) {
       );
       console.debug("Created " + JSON.stringify(contextualIdentity));
       router.addEntry(newEntry, contextualIdentity);
+    }
+
+    if (parsedPolicy.containers) {
+      console.debug("Clearing and setting router up");
+      router.clear();
+      // After we went through and created, updated and deleted everything, lets requery.  Then we will use these
+      // cookie store IDs to populate our containerRouter
+      const lookup = await browser.contextualIdentities
+        .query({})
+        .then((result) => {
+          return result.reduce((acc, value) => {
+            acc.set(value.name, value);
+            return acc;
+          }, new Map<string, ContextualIdentity>());
+        });
+      for (const definition of parsedPolicy.containers) {
+        const contextualIdentity = lookup.get(definition.name);
+        if (contextualIdentity) {
+          router.addEntry(definition, contextualIdentity);
+        } else {
+          console.error("Failed to find contextualIdentity we just set up");
+        }
+      }
     }
   });
 }

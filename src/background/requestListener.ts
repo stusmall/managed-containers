@@ -7,7 +7,7 @@ async function onBeforeRequest(
   details: _OnBeforeRequestDetails,
 ): Promise<BlockingResponse> {
   console.debug("Before a request for " + JSON.stringify(details));
-  browser.tabs.get(details.tabId).then((tab) => {
+  await browser.tabs.get(details.tabId).then((tab) => {
     console.debug("The tab information is " + JSON.stringify(tab));
   });
 

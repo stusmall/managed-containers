@@ -12,24 +12,20 @@ function buildNewContextualIdentitiesList(
     const item = buildListItem(contextualIdentity);
     div.appendChild(item);
   }
-  console.log(div);
   return div;
 }
 
 function buildListItem(contextualIdentity: ContextualIdentity): HTMLDivElement {
-  console.log(JSON.stringify(contextualIdentity));
   const panelListItem = document.createElement("div");
   panelListItem.className = "panel-list-item";
   const iconDiv = document.createElement("div");
   iconDiv.className = "icon";
   iconDiv.style.paddingRight = "1rem";
   iconDiv.style.paddingLeft = ".5rem";
-
   const iconImg = document.createElement("img");
   iconImg.src = contextualIdentity.iconUrl;
-  const filter = toColorfilter(contextualIdentity.color);
+  const filter = toColorFilter(contextualIdentity.color);
   if (filter) {
-    console.log("adding filter " + filter);
     iconDiv.style.filter = filter;
   }
   iconImg.style.width = "1rem";
@@ -39,15 +35,12 @@ function buildListItem(contextualIdentity: ContextualIdentity): HTMLDivElement {
   const textDiv = document.createElement("div");
   textDiv.className = "text";
   const text = document.createTextNode(contextualIdentity.name);
-  // const text = document.createElement("textarea");
-  // text.textContent = contextualIdentity.name;
   textDiv.appendChild(text);
-
   panelListItem.appendChild(textDiv);
   return panelListItem;
 }
 
-function toColorfilter(color: string): string | null {
+function toColorFilter(color: string): string | null {
   // Each of this is a filter generated with this tool:https://isotropic.co/tool/hex-color-to-css-filter/
   // The comment shows the original color code used to generate the filter
   switch (color) {
@@ -77,15 +70,13 @@ function toColorfilter(color: string): string | null {
   }
 }
 
-console.log("starting popup");
 browser.contextualIdentities.query({}).then((contextualIdentities) => {
   const newDiv = buildNewContextualIdentitiesList(contextualIdentities);
 
   const div = document.querySelector("#" + CONTAINER_LIST_ID);
   if (div) {
     div.replaceWith(newDiv);
-    console.log(document.body);
   } else {
-    console.log("Failed to find div");
+    console.error("Failed to find div");
   }
 });
