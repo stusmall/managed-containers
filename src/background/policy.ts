@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { managedContainerPrefix } from "./containers";
 
 export const Color = z.enum([
   "blue",
@@ -35,14 +34,15 @@ export const ContainerDefinition = z.object({
   sites: z.array(z.string()),
 });
 export const Policy = z.object({
-  containers: z.array(ContainerDefinition),
+  containers: z.optional(z.array(ContainerDefinition)),
+  exclude: z.optional(z.array(z.string())),
 });
 
 export function containerDefinitionToContextualIdentity(
   input: z.infer<typeof ContainerDefinition>,
 ) {
   return {
-    name: managedContainerPrefix + input.name,
+    name: input.name,
     icon: input.icon,
     color: input.color,
   };

@@ -36,7 +36,7 @@ test("To remove one policy", () => {
   });
   const state: ContextualIdentity[] = [
     {
-      name: "__managedContainersv1-to-remove",
+      name: "to-remove",
       icon: "vacation",
       iconUrl: "sdfsdfsdf",
       color: "sdfsd",
@@ -53,6 +53,7 @@ test("To remove one policy", () => {
 test("To skip over containers managed outside this plugin", () => {
   const policy = Policy.parse({
     containers: [],
+    exclude: ["something else"],
   });
   const state: ContextualIdentity[] = [
     {
@@ -83,7 +84,7 @@ test("To do nothing on an unchanged policy", () => {
   });
   const state: ContextualIdentity[] = [
     {
-      name: "__managedContainersv1-To Update",
+      name: "To Update",
       icon: "fruit",
       iconUrl: "sdfsdfsdf",
       color: "purple",
@@ -110,7 +111,7 @@ test("To update a changed policy", () => {
   });
   const state: ContextualIdentity[] = [
     {
-      name: "__managedContainersv1-To Update",
+      name: "To Update",
       icon: "chill",
       iconUrl: "sdfsdfsdf",
       color: "purple",
