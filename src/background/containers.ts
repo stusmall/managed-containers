@@ -2,10 +2,6 @@ import { ContainerDefinition, Policy } from "./policy";
 import ContextualIdentity = browser.contextualIdentities.ContextualIdentity;
 import { z } from "zod";
 
-//TODO: Remove this.  Instead of using this prefix to manage what I should control I should have the config contain a list
-// of containers to exempt
-export const managedContainerPrefix = "__managedContainersv1-";
-
 interface ToUpdateEntry {
   cookieStoreId: string;
   newValue: z.infer<typeof ContainerDefinition>;
@@ -23,9 +19,20 @@ export function buildContainerDifference(
   policy: z.infer<typeof Policy>,
   identities: ContextualIdentity[],
 ): PolicyEvalResults {
+  let excludeList: string[];
+  if (policy.exclude) {
+    excludeList = policy.exclude;
+  } else {
+    excludeList = [];
+  }
   const filteredExistingIdentities = identities
     .filter((identity) => {
-      return identity.name.startsWith(managedContainerPrefix);
+      for (const exclude of excludeList) {
+        if (identity.name == exclude) {
+          return false;
+        }
+      }
+      return true;
     })
     .reduce((acc, v) => {
       acc.set(v.name, v);
@@ -40,12 +47,11 @@ export function buildContainerDifference(
   const toAdd: Array<z.infer<typeof ContainerDefinition>> = [];
   const toUpdate = [];
   for (const container of containers) {
-    const fullName = managedContainerPrefix + container.name;
-    const configuredContainer = filteredExistingIdentities.get(fullName);
+    const configuredContainer = filteredExistingIdentities.get(container.name);
     if (!configuredContainer) {
       toAdd.push(container);
     } else {
-      filteredExistingIdentities.delete(fullName);
+      filteredExistingIdentities.delete(container.name);
       if (
         configuredContainer.color != container.color ||
         configuredContainer.icon != container.icon

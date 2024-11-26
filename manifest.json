@@ -13,7 +13,12 @@
     "webRequestBlocking"
   ],
   "background": {
-    "scripts": ["dist/background.js"]
+    "scripts": ["background.js"]
+  },
+  "browser_action": {
+    "browser_style": true,
+    "default_title": "Managed Containers",
+    "default_popup": "popup.html"
   },
   "browser_specific_settings": {
     "gecko": {
