@@ -11,7 +11,10 @@ async function onBeforeRequest(
     console.debug("The tab information is " + JSON.stringify(tab));
   });
 
-  const entry = containerRouter.lookUpHostname(new URL(details.url));
+  const entry = containerRouter.lookUpHostname(
+    new URL(details.url),
+    details.cookieStoreId,
+  );
   console.debug("In the request we got " + JSON.stringify(entry));
   if (details.cookieStoreId != entry) {
     await browser.tabs.create({

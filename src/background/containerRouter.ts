@@ -4,10 +4,14 @@ import ContextualIdentity = browser.contextualIdentities.ContextualIdentity;
 
 // At helper class to translate between hostnames and cookie store IDs
 export class ContainerRouter {
-  lookup: { [hostname: string]: string };
+  lookup: Map<string, string>;
+  excludedContainerNames: string[];
+  excludedCookieStoreIds: string[];
 
   constructor() {
-    this.lookup = {};
+    this.lookup = new Map();
+    this.excludedContainerNames = [];
+    this.excludedCookieStoreIds = [];
   }
 
   addEntry(
@@ -25,22 +29,38 @@ export class ContainerRouter {
           " will be handled by " +
           contextualIdentity.cookieStoreId,
       );
-      this.lookup[site] = contextualIdentity.cookieStoreId;
+      this.lookup.set(site, contextualIdentity.cookieStoreId);
+    }
+  }
+
+  setExcludedContainerNames(name: string[]) {
+    this.excludedContainerNames = name;
+  }
+
+  checkIfExcluded(contextualIdentity: ContextualIdentity) {
+    if (this.excludedContainerNames.includes(contextualIdentity.name)) {
+      this.excludedCookieStoreIds.push(contextualIdentity.cookieStoreId);
     }
   }
   clear() {
-    this.lookup = {};
+    this.lookup.clear();
+    this.excludedContainerNames = [];
+    this.excludedCookieStoreIds = [];
   }
 
-  lookUpHostname(hostname: URL): string {
+  lookUpHostname(hostname: URL, cookieStoreId: string | undefined): string {
     console.debug("Looking up " + hostname.hostname);
     console.debug("Contents is " + JSON.stringify(this.lookup));
+    console.debug("Excluded " + JSON.stringify(this.excludedCookieStoreIds));
+    if (cookieStoreId && this.excludedCookieStoreIds.includes(cookieStoreId)) {
+      return cookieStoreId;
+    }
     const split = hostname.hostname.split(".");
 
     if (split.length >= 2) {
       const last = split.pop();
       const base = split.pop();
-      const result = this.lookup[base + "." + last];
+      const result = this.lookup.get(base + "." + last);
       if (result == undefined) {
         return "firefox-default";
       } else {
