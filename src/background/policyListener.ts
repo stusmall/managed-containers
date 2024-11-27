@@ -4,9 +4,12 @@ import { ContainerRouter } from "./containerRouter";
 import ContextualIdentity = browser.contextualIdentities.ContextualIdentity;
 
 // Once we get a policy, lets attempt to parse it.  If it parses correctly update the containerRouter
-function parseAndApplyPolicy(router: ContainerRouter, blob: unknown) {
-  const parsedPolicy = Policy.parse(blob);
+function parseAndApplyPolicy(
+  router: ContainerRouter,
+  blob: { [p: string]: unknown },
+) {
   browser.contextualIdentities.query({}).then(async (contextualIdentities) => {
+    const parsedPolicy = Policy.parse(blob);
     const results = buildContainerDifference(
       parsedPolicy,
       contextualIdentities,
@@ -65,6 +68,20 @@ function parseAndApplyPolicy(router: ContainerRouter, blob: unknown) {
           console.error("Failed to find contextualIdentity we just set up");
         }
       }
+      // Now let's process all the excluded container names if we have any.
+      if (parsedPolicy.exclude) {
+        // Let's pass the list to the router first.  We do this so it can check on containers created later to see if
+        // they should be excluded
+        router.setExcludedContainerNames(parsedPolicy.exclude);
+        // This repeats some of the logic in the checkIfExcluded.  We *could* just pass in everything in lookup and have
+        // that sort it out, but do this to save some wasted processing.
+        for (const excluded of parsedPolicy.exclude) {
+          const value = lookup.get(excluded);
+          if (value) {
+            router.checkIfExcluded(value);
+          }
+        }
+      }
     }
   });
 }
@@ -75,7 +92,15 @@ export function setupPolicyListener(router: ContainerRouter) {
     console.debug(
       "We have received a configuration update " + JSON.stringify(change),
     );
-    parseAndApplyPolicy(router, change.newValue);
+    parseAndApplyPolicy(router, change);
+  });
+
+  browser.contextualIdentities.onCreated.addListener((change) => {
+    console.debug(
+      "One or more new contextual identities have been created " +
+        JSON.stringify(change),
+    );
+    router.checkIfExcluded(change.contextualIdentity);
   });
 
   console.debug("About to read from the managed manifest");
